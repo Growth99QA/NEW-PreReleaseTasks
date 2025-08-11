@@ -1,49 +1,48 @@
-package com.growth99.testcases.prerelease;
+package com.growth99.prerelease;
 
 
-	import org.openqa.selenium.By;
-	import org.openqa.selenium.WebDriver;
-	import org.openqa.selenium.WebElement;
-	import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-	public class HeroMediaCheck {
+import com.fasterxml.jackson.databind.JsonNode;
+import com.growth99.base.BaseClass;
+import com.growth99.pages.HeroMediaCheckPage;
 
-	    public static void main(String[] args) {
-	        WebDriver driver = new ChromeDriver();
-	        driver.get("https://ada1.gogroth.com/");  // Replace with your actual URL
 
-	        boolean videoLoaded = false;
-	        boolean fallbackImageLoaded = false;
+public class HeroMediaCheck extends BaseClass {
 
-	        try {
-	            // Try to find the hero video
-	            WebElement video = driver.findElement(By.xpath("//div[@id='main-slideshow']"));
-	            if (video.isDisplayed()) {
-	                System.out.println("PASS: Hero section video is present and visible.");
-	                videoLoaded = true;
-	            }
-	        } catch (Exception e) {
-	            System.out.println("Hero video not found.");
-	        }
+	WebDriver driver;
+	public JsonNode PreReleaseDataJsonData;
+	HeroMediaCheckPage HeroMediaCheckPage;
 
-	        if (!videoLoaded) {
-	            try {
-	                // Check for fallback image
-	                WebElement fallbackImage = driver.findElement(By.cssSelector(".hero img"));
-	                if (fallbackImage.isDisplayed()) {
-	                    System.out.println("PASS: Fallback image is displayed.");
-	                    fallbackImageLoaded = true;
-	                }
-	            } catch (Exception e) {
-	                System.out.println("Fallback image not found.");
-	            }
-	        }
 
-	        if (!videoLoaded && !fallbackImageLoaded) {
-	            System.out.println("FAIL: Neither video nor fallback image loaded.");
-	        }
-
-	        driver.quit();
-	    }
+	HeroMediaCheck(){
+		super();
+		PreReleaseDataJsonData = getJsonData("PreReleaseData.json");
 	}
 
+	@BeforeClass
+	public void setup() {
+		driver=initilazeBrowserWithUrl("preRelease");
+		HeroMediaCheckPage = new HeroMediaCheckPage(driver);
+	}
+
+
+	@Test(priority = 0)
+	public void validateHeroimageandvideoloading(){
+		//JsonNode testData=	PreReleaseDataJsonData.get("validateHeroimageandvideoloading");
+		HeroMediaCheckPage.validateHeroMedialoading();
+		driver.manage().window().setSize(new Dimension(390, 840)); // iPhone 12 size
+		HeroMediaCheckPage.validateHeroMedialoadingiphone();
+		driver.manage().window().setSize(new Dimension(1024, 1366));  //ipad
+		HeroMediaCheckPage.validateHeroMedialoadingipad();
+	}
+
+	@AfterClass
+	public void tearDown() {
+		driver.quit();
+	}
+}
